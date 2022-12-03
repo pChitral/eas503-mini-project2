@@ -23,9 +23,8 @@
         },
         {
             "name": "test_step4 (test_mini_project2.TestMiniProject2)",
-            "score": 0.0,
+            "score": 5,
             "max_score": 5,
-            "output": "Test Failed: \n",
             "visibility": "visible",
             "number": "step4"
         },
@@ -201,5 +200,5 @@
     "leaderboard": [],
     "visibility": "visible",
     "execution_time": "0.19",
-    "score": 15.0
+    "score": 20.0
 }

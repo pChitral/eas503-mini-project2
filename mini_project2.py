@@ -119,16 +119,21 @@ def step3_create_country_table(data_filename, normalized_database_filename):
     # In the following code I have prepared the data that needs to be inserted in a table
     # by traversing in the data.csv file
     country_region_list = []
-    region_to_regionid_dictionary = step2_create_region_to_regionid_dictionary(normalized_database_filename)
+
+    region_to_regionid_dictionary = step2_create_region_to_regionid_dictionary(
+        normalized_database_filename)
+
     with open(data_filename) as file:
         i = iter(file)
         i.__next__()
         for line in i:
             if [line.split("\t")[3], region_to_regionid_dictionary[line.split("\t")[4]]] not in country_region_list:
-                country_region_list.append([line.split("\t")[3], region_to_regionid_dictionary[line.split("\t")[4]]])
+                country_region_list.append(
+                    [line.split("\t")[3], region_to_regionid_dictionary[line.split("\t")[4]]])
             else:
                 continue
-    country_region_list.sort()        
+    country_region_list.sort()
+
     # SQL query for creating the Region table
     create_table_sql = """CREATE TABLE [country] (
     [CountryID] integer not null Primary key,
@@ -136,8 +141,8 @@ def step3_create_country_table(data_filename, normalized_database_filename):
     [RegionID] integer not null,
     FOREIGN KEY(RegionID) REFERENCES Region(RegionID)
     );
-    
     """
+    
     conn = create_connection(normalized_database_filename)
 
     # Running the query by passing it to the `create_table` function
@@ -157,7 +162,8 @@ def step3_create_country_table(data_filename, normalized_database_filename):
     with conn_norm:
         for country_region in country_region_list:
             try:
-                insert_country_region(conn_norm, (country_region[0], country_region[1]))
+                insert_country_region(
+                    conn_norm, (country_region[0], country_region[1]))
             except Error:
                 print(Error)
 
@@ -167,7 +173,17 @@ def step3_create_country_table(data_filename, normalized_database_filename):
 def step4_create_country_to_countryid_dictionary(normalized_database_filename):
 
     # BEGIN SOLUTION
-    pass
+    conn = create_connection(normalized_database_filename)
+    sql_statement = "SELECT Country, CountryID from country"
+    countries_from_table = execute_sql_statement(sql_statement, conn)
+
+    country_to_countryid_dictionary = {}
+
+    for i in range(len(countries_from_table)):
+        country_to_countryid_dictionary[countries_from_table[i]
+                                      [0]] = countries_from_table[i][1]
+
+    return country_to_countryid_dictionary
 
     # END SOLUTION
 
