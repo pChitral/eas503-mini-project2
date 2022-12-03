@@ -16,9 +16,8 @@
         },
         {
             "name": "test_step3 (test_mini_project2.TestMiniProject2)",
-            "score": 0.0,
+            "score": 5,
             "max_score": 5,
-            "output": "Test Failed: Execution failed on sql 'SELECT * FROM Country': no such table: Country\n",
             "visibility": "visible",
             "number": "step3"
         },
@@ -201,6 +200,6 @@
     ],
     "leaderboard": [],
     "visibility": "visible",
-    "execution_time": "0.09",
-    "score": 10.0
+    "execution_time": "0.19",
+    "score": 15.0
 }

@@ -116,7 +116,50 @@ def step3_create_country_table(data_filename, normalized_database_filename):
 
     # BEGIN SOLUTION
 
-    pass
+    # In the following code I have prepared the data that needs to be inserted in a table
+    # by traversing in the data.csv file
+    country_region_list = []
+    region_to_regionid_dictionary = step2_create_region_to_regionid_dictionary(normalized_database_filename)
+    with open(data_filename) as file:
+        i = iter(file)
+        i.__next__()
+        for line in i:
+            if [line.split("\t")[3], region_to_regionid_dictionary[line.split("\t")[4]]] not in country_region_list:
+                country_region_list.append([line.split("\t")[3], region_to_regionid_dictionary[line.split("\t")[4]]])
+            else:
+                continue
+    country_region_list.sort()        
+    # SQL query for creating the Region table
+    create_table_sql = """CREATE TABLE [country] (
+    [CountryID] integer not null Primary key,
+    [Country] Text not null,
+    [RegionID] integer not null,
+    FOREIGN KEY(RegionID) REFERENCES Region(RegionID)
+    );
+    
+    """
+    conn = create_connection(normalized_database_filename)
+
+    # Running the query by passing it to the `create_table` function
+    create_table(conn, create_table_sql)
+
+    # Creating a function for insertion in our table, which is freshly created above
+    def insert_country_region(conn, values):
+        sql = ''' INSERT INTO country(Country, RegionID)
+                VALUES(?, ?) '''
+        cur = conn.cursor()
+        cur.execute(sql, values)
+        return cur.lastrowid
+
+    # That the insert_country_region function is ready, we can start putting in values in the table as follows!
+    conn_norm = create_connection(normalized_database_filename)
+
+    with conn_norm:
+        for country_region in country_region_list:
+            try:
+                insert_country_region(conn_norm, (country_region[0], country_region[1]))
+            except Error:
+                print(Error)
 
     # END SOLUTION
 
