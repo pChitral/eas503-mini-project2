@@ -62,31 +62,38 @@ def step1_create_region_table(data_filename, normalized_database_filename):
             else:
                 continue
     region_list.sort()
+    
+    # Converting our list of strings into a list of tuples by also adding in the id field 
+    for i in range(len(region_list)):
+        region_list[i] = (i+1 , region_list[i]) 
 
+    """
+    
+    Setting up connection with the database and creating the table
+    
+    """
+    conn = create_connection(normalized_database_filename)
+    
     # SQL query for creating the Region table
     create_table_sql = """CREATE TABLE [Region] (
     [RegionID] Integer not null primary key,
     [Region] Text not null
     );
     """
-    conn = create_connection(normalized_database_filename)
 
     # Running the query by passing it to the `create_table` function
     create_table(conn, create_table_sql)
 
-    # Creating a function for insertion in our table, which is freshly created above
-    def insert_region(conn, values):
-        sql = ''' INSERT INTO Region(Region)
-                VALUES(?) '''
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        return cur.lastrowid
-
-    # That the insert_region function is ready, we can start putting in values in the table as follows!
-    conn_norm = create_connection(normalized_database_filename)
-    with conn_norm:
-        for region in region_list:
-            insert_region(conn_norm, (region, ))
+    """
+    
+    Dumping in the entire list, all at once, with the help of executemany
+    
+    """
+    
+    c = conn.cursor()
+    c.executemany('INSERT INTO Region VALUES(?, ?);',region_list)
+    conn.commit()
+    conn.close()
 
     # END SOLUTION
 
@@ -133,8 +140,16 @@ def step3_create_country_table(data_filename, normalized_database_filename):
             else:
                 continue
     country_region_list.sort()
+    
+    # Creating a list of tuples 
+    for i, country in enumerate(country_region_list):
+        country_region_list[i] =  (i+1, country_region_list[i][0], country_region_list[i][1])
+
 
     # SQL query for creating the Region table
+    
+    conn = create_connection(normalized_database_filename)
+    
     create_table_sql = """CREATE TABLE [country] (
     [CountryID] integer not null Primary key,
     [Country] Text not null,
@@ -142,30 +157,15 @@ def step3_create_country_table(data_filename, normalized_database_filename):
     FOREIGN KEY(RegionID) REFERENCES Region(RegionID)
     );
     """
-
-    conn = create_connection(normalized_database_filename)
-
     # Running the query by passing it to the `create_table` function
     create_table(conn, create_table_sql)
-
-    # Creating a function for insertion in our table, which is freshly created above
-    def insert_country_region(conn, values):
-        sql = ''' INSERT INTO country(Country, RegionID)
-                VALUES(?, ?) '''
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        return cur.lastrowid
-
-    # That the insert_country_region function is ready, we can start putting in values in the table as follows!
-    conn_norm = create_connection(normalized_database_filename)
-
-    with conn_norm:
-        for country_region in country_region_list:
-            try:
-                insert_country_region(
-                    conn_norm, (country_region[0], country_region[1]))
-            except Error:
-                print(Error)
+    
+    # I N S E R T I O N   P A R T 
+    c = conn.cursor()
+    c.executemany('INSERT INTO country VALUES(?, ?, ?);',country_region_list)
+    conn.commit()
+    conn.close()
+    
 
     # END SOLUTION
 
