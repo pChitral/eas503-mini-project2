@@ -191,7 +191,8 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
 
     # BEGIN SOLUTION
 
-    country_to_countryid_dictionary = step4_create_country_to_countryid_dictionary(normalized_database_filename)
+    country_to_countryid_dictionary = step4_create_country_to_countryid_dictionary(
+        normalized_database_filename)
     country_to_countryid_dictionary
 
     step5_data = []
@@ -209,9 +210,9 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
     step5_data.sort()
     for i, stuff in enumerate(step5_data):
         step5_data[i] = (i+1, stuff[0], stuff[1], stuff[2], stuff[3], stuff[4])
-    
-    # Now here we have prepared the sauce that needs to be cooked 
-    
+
+    # Now here we have prepared the sauce that needs to be cooked
+
     conn = create_connection(normalized_database_filename)
 
     create_table_sql = """CREATE TABLE [Customer] (
@@ -226,13 +227,12 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
     """
     # Running the query by passing it to the `create_table` function
     create_table(conn, create_table_sql)
-    
+
     # I N S E R T I O N   P A R T
     c = conn.cursor()
     c.executemany('INSERT INTO Customer VALUES(?, ?, ?, ?, ?, ?);', step5_data)
     conn.commit()
     conn.close()
-    
 
     # END SOLUTION
 
@@ -240,7 +240,19 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
 def step6_create_customer_to_customerid_dictionary(normalized_database_filename):
 
     # BEGIN SOLUTION
-    pass
+    conn = create_connection(normalized_database_filename)
+    sql_statement = "SELECT FirstName, LastName from Customer"
+    customers_from_table = execute_sql_statement(sql_statement, conn)
+
+    customer_to_customerid_dictionary = {}
+    customers_from_table[0]
+
+
+    for i in range(len(customers_from_table)):
+        key = str(customers_from_table[i][0]) + " " + str(customers_from_table[i][1])
+        customer_to_customerid_dictionary[key] = i + 1
+
+    return customer_to_customerid_dictionary
 
     # END SOLUTION
 
