@@ -62,10 +62,10 @@ def step1_create_region_table(data_filename, normalized_database_filename):
             else:
                 continue
     region_list.sort()
-    
-    # Converting our list of strings into a list of tuples by also adding in the id field 
+
+    # Converting our list of strings into a list of tuples by also adding in the id field
     for i in range(len(region_list)):
-        region_list[i] = (i+1 , region_list[i]) 
+        region_list[i] = (i+1, region_list[i])
 
     """
     
@@ -73,7 +73,7 @@ def step1_create_region_table(data_filename, normalized_database_filename):
     
     """
     conn = create_connection(normalized_database_filename)
-    
+
     # SQL query for creating the Region table
     create_table_sql = """CREATE TABLE [Region] (
     [RegionID] Integer not null primary key,
@@ -89,9 +89,9 @@ def step1_create_region_table(data_filename, normalized_database_filename):
     Dumping in the entire list, all at once, with the help of executemany
     
     """
-    
+
     c = conn.cursor()
-    c.executemany('INSERT INTO Region VALUES(?, ?);',region_list)
+    c.executemany('INSERT INTO Region VALUES(?, ?);', region_list)
     conn.commit()
     conn.close()
 
@@ -140,16 +140,16 @@ def step3_create_country_table(data_filename, normalized_database_filename):
             else:
                 continue
     country_region_list.sort()
-    
-    # Creating a list of tuples 
-    for i, country in enumerate(country_region_list):
-        country_region_list[i] =  (i+1, country_region_list[i][0], country_region_list[i][1])
 
+    # Creating a list of tuples
+    for i, country in enumerate(country_region_list):
+        country_region_list[i] = (
+            i+1, country[0], country[1])
 
     # SQL query for creating the Region table
-    
+
     conn = create_connection(normalized_database_filename)
-    
+
     create_table_sql = """CREATE TABLE [country] (
     [CountryID] integer not null Primary key,
     [Country] Text not null,
@@ -159,13 +159,12 @@ def step3_create_country_table(data_filename, normalized_database_filename):
     """
     # Running the query by passing it to the `create_table` function
     create_table(conn, create_table_sql)
-    
-    # I N S E R T I O N   P A R T 
+
+    # I N S E R T I O N   P A R T
     c = conn.cursor()
-    c.executemany('INSERT INTO country VALUES(?, ?, ?);',country_region_list)
+    c.executemany('INSERT INTO country VALUES(?, ?, ?);', country_region_list)
     conn.commit()
     conn.close()
-    
 
     # END SOLUTION
 
@@ -192,7 +191,48 @@ def step5_create_customer_table(data_filename, normalized_database_filename):
 
     # BEGIN SOLUTION
 
-    pass
+    country_to_countryid_dictionary = step4_create_country_to_countryid_dictionary(normalized_database_filename)
+    country_to_countryid_dictionary
+
+    step5_data = []
+
+    with open("data.csv") as file:
+        i = iter(file)
+        i.__next__()
+        for line in i:
+            firstName, lastName = line.split("\t")[0].split(" ", 1)
+            if [firstName, lastName,  line.split("\t")[1], line.split("\t")[2], country_to_countryid_dictionary[line.split("\t")[3]]] not in step5_data:
+                step5_data.append(
+                    [firstName, lastName,  line.split("\t")[1], line.split("\t")[2], country_to_countryid_dictionary[line.split("\t")[3]]])
+            else:
+                continue
+    step5_data.sort()
+    for i, stuff in enumerate(step5_data):
+        step5_data[i] = (i+1, stuff[0], stuff[1], stuff[2], stuff[3], stuff[4])
+    
+    # Now here we have prepared the sauce that needs to be cooked 
+    
+    conn = create_connection(normalized_database_filename)
+
+    create_table_sql = """CREATE TABLE [Customer] (
+    [CustomerID] integer not null Primary Key,
+    [FirstName] Text not null,
+    [LastName] Text not null,
+    [Address] Text not null,
+    [City] Text not null,
+    [CountryID] integer not null,
+    foreign key(CountryID) REFERENCES country(CountryID)
+    );
+    """
+    # Running the query by passing it to the `create_table` function
+    create_table(conn, create_table_sql)
+    
+    # I N S E R T I O N   P A R T
+    c = conn.cursor()
+    c.executemany('INSERT INTO Customer VALUES(?, ?, ?, ?, ?, ?);', step5_data)
+    conn.commit()
+    conn.close()
+    
 
     # END SOLUTION
 
