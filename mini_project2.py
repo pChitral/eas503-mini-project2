@@ -142,7 +142,7 @@ def step3_create_country_table(data_filename, normalized_database_filename):
     FOREIGN KEY(RegionID) REFERENCES Region(RegionID)
     );
     """
-    
+
     conn = create_connection(normalized_database_filename)
 
     # Running the query by passing it to the `create_table` function
@@ -181,7 +181,7 @@ def step4_create_country_to_countryid_dictionary(normalized_database_filename):
 
     for i in range(len(countries_from_table)):
         country_to_countryid_dictionary[countries_from_table[i]
-                                      [0]] = countries_from_table[i][1]
+                                        [0]] = countries_from_table[i][1]
 
     return country_to_countryid_dictionary
 

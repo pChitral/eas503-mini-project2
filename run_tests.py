@@ -4,7 +4,7 @@ import os
 
 if __name__ == '__main__':
     suite = unittest.defaultTestLoader.discover('tests')
-    if os.path.exists('/autograder/results/'):
+    if os.path.exists('/autograder/results/'): 
         filepath = '/autograder/results/results.json'
     else:
         filepath = './results.json'
