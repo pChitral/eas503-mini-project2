@@ -247,9 +247,9 @@ def step6_create_customer_to_customerid_dictionary(normalized_database_filename)
     customer_to_customerid_dictionary = {}
     customers_from_table[0]
 
-
     for i in range(len(customers_from_table)):
-        key = str(customers_from_table[i][0]) + " " + str(customers_from_table[i][1])
+        key = str(customers_from_table[i][0]) + \
+            " " + str(customers_from_table[i][1])
         customer_to_customerid_dictionary[key] = i + 1
 
     return customer_to_customerid_dictionary
@@ -262,7 +262,51 @@ def step7_create_productcategory_table(data_filename, normalized_database_filena
     # Output: None
 
     # BEGIN SOLUTION
-    pass
+    prod_cat_list = []
+    with open(data_filename) as file:
+        i = iter(file)
+        i.__next__()
+        for line in i:
+            if [line.split("\t")[6].split(",")[0], line.split("\t")[7].split("/")[0]]  not in prod_cat_list:
+                prod_cat_list.append([line.split("\t")[6].split(",")[0], line.split("\t")[7].split("/")[0]])
+            else:
+                continue
+
+    newMaal = []
+    for i in range(len(prod_cat_list)):
+        if [prod_cat_list[i][0].split(";")[0], prod_cat_list[i][1].split(";")[0]] not in newMaal:
+            newMaal.append([prod_cat_list[i][0].split(";")[0], prod_cat_list[i][1].split(";", 1)[0]])
+    newMaal.sort()    
+    
+
+    for i in range(len(newMaal)):
+        newMaal[i] = (i+1, newMaal[i][0], newMaal[i][1])
+    newMaal
+        
+    # SQL query for creating the Region table
+
+    conn = create_connection(normalized_database_filename)
+
+    create_table_sql = """CREATE TABLE [ProductCategory] (
+    [ProductCategoryID] integer not null Primary Key,
+    [ProductCategory] Text not null,
+    [ProductCategoryDescription] Text not null
+    );
+    """
+    # Running the query by passing it to the `create_table` function
+    create_table(conn, create_table_sql)
+    
+    """
+    
+    Dumping in the entire list, all at once, with the help of executemany
+    
+    """
+
+    c = conn.cursor()
+    c.executemany('INSERT INTO ProductCategory VALUES(?, ?, ?);', newMaal)
+    conn.commit()
+    conn.close()
+    
 
     # END SOLUTION
 
