@@ -334,7 +334,52 @@ def step9_create_product_table(data_filename, normalized_database_filename):
 
     # BEGIN SOLUTION
 
-    pass
+    productcategory_to_productcategoryid_dictionary = step8_create_productcategory_to_productcategoryid_dictionary(
+        normalized_database_filename)
+    with open("data.csv") as file:
+        i = iter(file)
+        header = i.__next__().strip().split()
+        raw_list = i.__next__().split("\t")
+
+    product_list = []
+    names = raw_list[5].split(";")
+    prices = raw_list[8].split(";")
+    id = raw_list[6].split(";")
+    for i in range(len(raw_list[8].split(";"))):
+        if [names[i], prices[i], productcategory_to_productcategoryid_dictionary[id[i]]] not in product_list:
+            product_list.append(
+                [names[i], prices[i], productcategory_to_productcategoryid_dictionary[id[i]]])
+    product_list.sort()
+
+    for i in range(len(product_list)):
+        product_list[i] = (i+1, product_list[i][0],
+                           product_list[i][1], product_list[i][2])
+
+    # SQL query for creating the Product table
+
+    conn = create_connection(normalized_database_filename)
+
+    create_table_sql = """CREATE TABLE [Product] (
+    [ProductID] integer not null Primary key,
+    [ProductName] Text not null,
+    [ProductUnitPrice] Real not null,
+    [ProductCategoryID] integer not null,
+    foreign key(ProductCategoryID) references ProductCategory(ProductCategoryID)
+    );
+    """
+    # Running the query by passing it to the `create_table` function
+    create_table(conn, create_table_sql)
+
+    """
+    
+    Dumping in the entire list, all at once, with the help of executemany
+    
+    """
+
+    c = conn.cursor()
+    c.executemany('INSERT INTO Product VALUES(?, ?, ?, ?);', product_list)
+    conn.commit()
+    conn.close()
 
     # END SOLUTION
 
