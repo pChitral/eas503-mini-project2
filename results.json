@@ -51,9 +51,8 @@
         },
         {
             "name": "test_step8 (test_mini_project2.TestMiniProject2)",
-            "score": 0.0,
+            "score": 5,
             "max_score": 5,
-            "output": "Test Failed: \n",
             "visibility": "visible",
             "number": "step8"
         },
@@ -196,6 +195,6 @@
     ],
     "leaderboard": [],
     "visibility": "visible",
-    "execution_time": "0.69",
-    "score": 35.0
+    "execution_time": "0.71",
+    "score": 40.0
 }
