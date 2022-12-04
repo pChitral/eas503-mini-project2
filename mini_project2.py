@@ -387,7 +387,17 @@ def step9_create_product_table(data_filename, normalized_database_filename):
 def step10_create_product_to_productid_dictionary(normalized_database_filename):
 
     # BEGIN SOLUTION
-    pass
+    conn = create_connection(normalized_database_filename)
+    sql_statement = "SELECT ProductName, ProductID from Product"
+    prodname_from_table = execute_sql_statement(sql_statement, conn)
+
+    product_to_productid_dictionary = {}
+
+    for i in range(len(prodname_from_table)):
+        product_to_productid_dictionary[prodname_from_table[i]
+                                        [0]] = prodname_from_table[i][1]
+
+    return product_to_productid_dictionary
 
     # END SOLUTION
 
